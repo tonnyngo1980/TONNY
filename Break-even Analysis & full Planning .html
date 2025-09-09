@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="vi-en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lập Kế Hoạch Hòa Vốn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .input-text-color {
+            color: #1f2937;
+        }
+        .output-text-color {
+            color: #b91c1c;
+        }
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
+            border-color: transparent;
+        }
+        .section-header {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+        }
+        .glow-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 bg-gray-100">
+    <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-12 w-full max-w-4xl glow-shadow">
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-gray-800 text-center mb-4">
+            Lập Kế Hoạch Hòa Vốn
+        </h1>
+        <p class="text-center text-gray-500 mb-8 text-lg sm:text-xl">Break-even Analysis & Planning</p>
+
+        <!-- A. Dữ liệu đầu vào / A. Input data -->
+        <div class="space-y-8">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-700 section-header">
+                A. Dữ Liệu Đầu Vào / <span class="font-medium text-gray-500 text-lg">Input Data</span>
+            </h2>
+            
+            <div class="space-y-6 p-6 rounded-2xl bg-gray-50 border border-gray-200 shadow-sm">
+                <!-- Basic Inputs -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="net-revenue" class="block text-sm font-semibold text-gray-700 mb-1">1. Doanh Thu Thuần / Net Revenue</label>
+                        <div class="relative mt-1 rounded-lg shadow-sm">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 font-bold">VND</span>
+                            <input type="text" id="net-revenue" class="input-text-color font-bold block w-full rounded-lg border-gray-300 p-3 pl-14 text-gray-900 focus:ring-2 focus:ring-blue-500" placeholder="Ví dụ: 50,000,000" oninput="formatAndCalculate(this)" />
+                        </div>
+                    </div>
+                    <div>
+                        <label for="cogs" class="block text-sm font-semibold text-gray-700 mb-1">2. Giá Vốn Hàng Bán / Cost of Goods Sold (COGS)</label>
+                        <div class="relative mt-1 rounded-lg shadow-sm">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 font-bold">VND</span>
+                            <input type="text" id="cogs" class="input-text-color font-bold block w-full rounded-lg border-gray-300 p-3 pl-14 text-gray-900 focus:ring-2 focus:ring-blue-500" placeholder="Ví dụ: 25,000,000" oninput="formatAndCalculate(this)" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lợi nhuận gộp -->
+                <div class="flex flex-col sm:flex-row justify-between items-center bg-gray-200 rounded-xl p-5 shadow-inner">
+                    <p class="text-base sm:text-lg font-semibold text-gray-700">3. Lợi Nhuận Gộp / Gross Profit</p>
+                    <p id="gross-profit" class="output-text-color text-2xl font-extrabold mt-2 sm:mt-0">0 VND</p>
+                </div>
+
+                <!-- Tỷ suất Lợi Nhuận Gộp -->
+                <div class="flex flex-col sm:flex-row justify-between items-center bg-blue-50 rounded-xl p-5 shadow-inner">
+                    <p class="text-base sm:text-lg font-semibold text-gray-700">4. Tỷ suất Lợi Nhuận Gộp / Gross Profit Margin Ratio</p>
+                    <p id="gross-profit-margin-ratio" class="output-text-color text-2xl font-extrabold mt-2 sm:mt-0">0%</p>
+                </div>
+
+                <!-- Chi phí Biến đổi chi tiết / Detailed Variable Costs -->
+                <div class="space-y-4 mt-6 p-4 rounded-xl bg-gray-100 border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-700">5. Chi Tiết Biến Phí / <span class="text-base">Detailed Variable Costs</span></h3>
+                    <p class="text-sm text-gray-500 italic">Ví dụ: Chi phí quảng cáo, chi phí vận chuyển.</p>
+                    <div id="variable-costs-container" class="space-y-4"></div>
+                    <div class="flex justify-between items-center pt-4 border-t border-gray-300">
+                        <p class="font-bold text-gray-800">Tổng Biến Phí: / Total Variable Costs:</p>
+                        <p id="total-variable-cost-display" class="font-bold text-gray-800">0 VND</p>
+                    </div>
+                    <button onclick="addCostInput('variable-costs')" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
+                        + Thêm Biến Phí / Add Variable Cost
+                    </button>
+                </div>
+
+                <!-- Chi phí Cố định chi tiết / Detailed Fixed Costs -->
+                <div class="space-y-4 mt-6 p-4 rounded-xl bg-gray-100 border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-700">6. Chi Tiết Định Phí / <span class="text-base">Detailed Fixed Costs</span></h3>
+                    <p class="text-sm text-gray-500 italic">Ví dụ: Chi phí thuê nhà, lương nhân viên quản lý.</p>
+                    <div id="fixed-costs-container" class="space-y-4"></div>
+                    <div class="flex justify-between items-center pt-4 border-t border-gray-300">
+                        <p class="font-bold text-gray-800">Tổng Định Phí: / Total Fixed Costs:</p>
+                        <p id="total-fixed-cost-display" class="font-bold text-gray-800">0 VND</p>
+                    </div>
+                    <button onclick="addCostInput('fixed-costs')" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
+                        + Thêm Định Phí / Add Fixed Cost
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div>
+                        <label for="depreciation-cost" class="block text-sm font-semibold text-gray-700 mb-1">7. Chi Phí Khấu Hao / Depreciation Cost</label>
+                        <p class="text-xs text-gray-500 italic mb-2">Để tính Dòng Tiền Hòa Vốn.</p>
+                        <div class="relative mt-1 rounded-lg shadow-sm">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 font-bold">VND</span>
+                            <input type="text" id="depreciation-cost" class="input-text-color font-bold block w-full rounded-lg border-gray-300 p-3 pl-14 text-gray-900 focus:ring-2 focus:ring-blue-500" placeholder="Ví dụ: 500,000" oninput="formatAndCalculate(this)" />
+                        </div>
+                    </div>
+                    <div>
+                        <label for="initial-investment" class="block text-sm font-semibold text-gray-700 mb-1">8. Tổng Vốn Đầu Tư / Initial Investment</label>
+                        <p class="text-xs text-gray-500 italic mb-2">Toàn bộ chi phí ban đầu.</p>
+                        <div class="relative mt-1 rounded-lg shadow-sm">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 font-bold">VND</span>
+                            <input type="text" id="initial-investment" class="input-text-color font-bold block w-full rounded-lg border-gray-300 p-3 pl-14 text-gray-900 focus:ring-2 focus:ring-blue-500" placeholder="Ví dụ: 250,000,000" oninput="formatAndCalculate(this)" />
+                        </div>
+                    </div>
+                    <div>
+                        <label for="target-daily-revenue" class="block text-sm font-semibold text-gray-700 mb-1">9. Doanh Thu Mục Tiêu Mỗi Ngày / Target Daily Revenue</label>
+                        <p class="text-xs text-gray-500 italic mb-2">Để tính Thời Gian Hòa Vốn.</p>
+                        <div class="relative mt-1 rounded-lg shadow-sm">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 font-bold">VND</span>
+                            <input type="text" id="target-daily-revenue" class="input-text-color font-bold block w-full rounded-lg border-gray-300 p-3 pl-14 text-gray-900 focus:ring-2 focus:ring-blue-500" placeholder="Ví dụ: 5,000,000" oninput="formatAndCalculate(this)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- B. Kết quả phân tích / B. Analysis Results -->
+        <div id="results" class="mt-12 pt-8 border-t border-gray-300 space-y-6 hidden">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-700 section-header">
+                B. Kết quả phân tích / <span class="font-medium text-gray-500 text-lg">Analysis Results</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Doanh thu hòa vốn / Break-even Revenue -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 shadow-md flex flex-col items-start">
+                    <p class="text-base font-semibold text-gray-700">Doanh Thu Hòa Vốn (Break-even Revenue)</p>
+                    <p id="breakeven-revenue" class="output-text-color text-2xl font-extrabold mt-2">0 VND</p>
+                    <p class="text-xs text-gray-500 italic mt-2">Công thức: Tổng Định Phí / Tỷ suất Lợi nhuận Biến đổi</p>
+                </div>
+
+                <!-- Thời gian hòa vốn / Time to Break-even -->
+                <div class="bg-gradient-to-r from-purple-50 to-fuchsia-50 rounded-xl p-5 shadow-md flex flex-col items-start">
+                    <p class="text-base font-semibold text-gray-700">Thời Gian Hòa Vốn (Time to Break-even)</p>
+                    <p id="time-to-breakeven" class="output-text-color text-2xl font-extrabold mt-2">0 ngày / 0 days</p>
+                    <p class="text-xs text-gray-500 italic mt-2">Công thức: Doanh thu Hòa vốn / Doanh thu Mục tiêu Mỗi ngày</p>
+                </div>
+            
+                <!-- Dòng tiền hòa vốn / Cash Break-even -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-5 shadow-md flex flex-col items-start">
+                    <p class="text-base font-semibold text-gray-700">Dòng Tiền Hòa Vốn (Cash Break-even)</p>
+                    <p id="cash-breakeven" class="output-text-color text-2xl font-extrabold mt-2">0 VND</p>
+                    <p class="text-xs text-gray-500 italic mt-2">Công thức: Tổng Định Phí - Chi phí Khấu hao</p>
+                </div>
+
+                <!-- Thời gian hoàn vốn đầu tư / Time to payback initial investment -->
+                <div class="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-5 shadow-md flex flex-col items-start">
+                    <p class="text-base font-semibold text-gray-700">Thời Gian Hoàn Vốn Đầu Tư (Payback Period)</p>
+                    <p id="payback-period" class="output-text-color text-2xl font-extrabold mt-2">0 ngày / 0 days</p>
+                    <p class="text-xs text-gray-500 italic mt-2">Công thức: Tổng Vốn Đầu tư / (Tổng Lợi nhuận mỗi tháng)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- C. Các công thức / C. Formulas -->
+        <div class="mt-12 pt-8 border-t border-gray-300 space-y-4">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-700 section-header">
+                C. Các Công Thức / <span class="font-medium text-gray-500 text-lg">Formulas</span>
+            </h2>
+            <div class="space-y-4 p-6 rounded-2xl bg-gray-100 border border-gray-200 shadow-sm">
+                <p class="text-sm font-medium text-gray-700">1. Lợi nhuận gộp (Gross Profit) = Doanh thu thuần - Giá vốn hàng bán</p>
+                <p class="text-sm font-medium text-gray-700">2. Tỷ suất Lợi nhuận gộp (Gross Profit Margin Ratio) = (Lợi nhuận gộp / Doanh thu thuần) x 100%</p>
+                <p class="text-sm font-medium text-gray-700">3. Tổng Biến Phí (Total Variable Costs) = Giá vốn hàng bán + Tổng Chi tiết Biến phí</p>
+                <p class="text-sm font-medium text-gray-700">4. Lợi nhuận Biến đổi (Contribution Margin) = Doanh thu thuần - Tổng Biến Phí</p>
+                <p class="text-sm font-medium text-gray-700">5. Tỷ suất Lợi nhuận Biến đổi (Contribution Margin Ratio) = Lợi nhuận Biến đổi / Doanh thu thuần</p>
+                <p class="text-sm font-medium text-gray-700">6. Doanh thu Hòa vốn (Break-even Revenue) = Tổng Định Phí / Tỷ suất Lợi nhuận Biến đổi</p>
+                <p class="text-sm font-medium text-gray-700">7. Thời gian Hòa vốn (Time to Break-even) = Doanh thu Hòa vốn / Doanh thu Mục tiêu Mỗi ngày</p>
+                <p class="text-sm font-medium text-gray-700">8. Dòng tiền Hòa vốn (Cash Break-even) = Tổng Định Phí - Chi phí Khấu hao</p>
+                <p class="text-sm font-medium text-gray-700">9. Thời gian Hoàn vốn (Payback Period) = Tổng Vốn Đầu tư / (Tổng Lợi nhuận mỗi tháng)</p>
+            </div>
+        </div>
+
+        <div class="mt-12 text-center text-gray-400 text-sm">
+            <p class="font-bold">© 2025 Ngô Đức Vĩnh. Mọi quyền được bảo lưu. Email: ngoducvinh1980@gmail.com</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            addCostInput('fixed-costs');
+            addCostInput('variable-costs');
+        });
+        
+        function addCostInput(type) {
+            const container = document.getElementById(type + '-container');
+            const costItem = document.createElement('div');
+            costItem.className = "flex flex-col sm:flex-row gap-4 items-center";
+            const placeholderTextName = (type === 'fixed-costs') ? 'Tên định phí / Fixed Cost Name' : 'Tên biến phí / Variable Cost Name';
+            const placeholderTextAmount = "Số tiền / Amount";
+
+            costItem.innerHTML = `
+                <input type="text" class="input-text-color font-bold block w-full sm:w-1/2 rounded-lg border-gray-300 p-3 text-gray-900 focus:ring-2 focus:ring-blue-500" placeholder="${placeholderTextName}" />
+                <div class="relative w-full sm:w-1/2 rounded-lg shadow-sm">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 font-bold">VND</span>
+                    <input type="text" class="cost-amount input-text-color font-bold block w-full rounded-lg border-gray-300 p-3 pl-14 text-gray-900 focus:ring-2 focus:ring-blue-500" placeholder="${placeholderTextAmount}" oninput="formatAndCalculate(this)" data-cost-type="${type}" />
+                </div>
+            `;
+            container.appendChild(costItem);
+        }
+
+        function formatAndCalculate(input) {
+            const rawValue = input.value.replace(/[^0-9]/g, '');
+            input.value = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            
+            const costType = input.getAttribute('data-cost-type');
+            if (costType) {
+                updateCosts(costType);
+            } else {
+                calculateAll();
+            }
+        }
+
+        function cleanAndParse(value) {
+            return parseFloat(value.replace(/,/g, '')) || 0;
+        }
+
+        function updateCosts(type) {
+            const container = document.getElementById(type + '-container');
+            const amounts = container.querySelectorAll('.cost-amount');
+            let total = 0;
+            amounts.forEach(input => {
+                total += cleanAndParse(input.value);
+            });
+
+            if (type === 'fixed-costs') {
+                document.getElementById('total-fixed-cost-display').textContent = formatVND(total);
+            } else if (type === 'variable-costs') {
+                document.getElementById('total-variable-cost-display').textContent = formatVND(total);
+            }
+
+            calculateAll();
+        }
+
+        function calculateAll() {
+            const netRevenue = cleanAndParse(document.getElementById('net-revenue').value);
+            const cogs = cleanAndParse(document.getElementById('cogs').value);
+            const depreciationCost = cleanAndParse(document.getElementById('depreciation-cost').value);
+            const initialInvestment = cleanAndParse(document.getElementById('initial-investment').value);
+            const totalFixedCost = cleanAndParse(document.getElementById('total-fixed-cost-display').textContent);
+            const totalVariableCost = cleanAndParse(document.getElementById('total-variable-cost-display').textContent);
+            const targetDailyRevenue = cleanAndParse(document.getElementById('target-daily-revenue').value);
+            
+            const resultsDiv = document.getElementById('results');
+            if (netRevenue > 0 || cogs > 0 || totalFixedCost > 0 || totalVariableCost > 0 || depreciationCost > 0 || initialInvestment > 0 || targetDailyRevenue > 0) {
+                 resultsDiv.classList.remove('hidden');
+            } else {
+                 resultsDiv.classList.add('hidden');
+                 return;
+            }
+
+            // Calculations
+            const grossProfit = netRevenue - cogs;
+            const grossProfitMarginRatio = (netRevenue > 0) ? (grossProfit / netRevenue) * 100 : 0;
+            const grossProfitMargin = (netRevenue > 0) ? (grossProfit / netRevenue) : 0;
+
+            const totalCombinedVariableCosts = cogs + totalVariableCost;
+            const contributionMargin = netRevenue - totalCombinedVariableCosts;
+            const contributionMarginRatio = (netRevenue > 0) ? (contributionMargin / netRevenue) : 0;
+            
+            const breakevenRevenue = (contributionMarginRatio > 0) ? (totalFixedCost / contributionMarginRatio) : 0;
+            const timeToBreakeven = (targetDailyRevenue > 0) ? (breakevenRevenue / targetDailyRevenue) : 0;
+            const cashBreakeven = totalFixedCost - depreciationCost;
+            const totalMonthlyCosts = totalCombinedVariableCosts + totalFixedCost;
+            const totalMonthlyProfit = netRevenue - totalMonthlyCosts;
+            const paybackPeriod = (totalMonthlyProfit > 0) ? (initialInvestment / totalMonthlyProfit) * 30 : 0; 
+            
+            // Display results
+            document.getElementById('gross-profit').textContent = formatVND(grossProfit);
+            document.getElementById('gross-profit-margin-ratio').textContent = formatPercentage(grossProfitMarginRatio);
+            document.getElementById('breakeven-revenue').textContent = formatVND(breakevenRevenue);
+            document.getElementById('time-to-breakeven').textContent = formatTime(timeToBreakeven);
+            document.getElementById('cash-breakeven').textContent = formatVND(cashBreakeven);
+            document.getElementById('payback-period').textContent = formatTime(paybackPeriod);
+        }
+        
+        function formatVND(number) {
+            if (isNaN(number) || !isFinite(number)) return "Không khả thi / Not viable";
+            const formattedNumber = new Intl.NumberFormat('vi-VN', {
+                style: 'decimal',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format(number);
+            return `${formattedNumber} VND`;
+        }
+        
+        function formatTime(days) {
+            if (isNaN(days) || !isFinite(days) || days < 0) return "Không khả thi / Not viable";
+            return `${days.toFixed(1)} ngày / days`;
+        }
+        
+        function formatPercentage(number) {
+            if (isNaN(number) || !isFinite(number) || number < 0) return "Không khả thi / Not viable";
+            return `${number.toFixed(2)}%`;
+        }
+    </script>
+</body>
+</html>
+
